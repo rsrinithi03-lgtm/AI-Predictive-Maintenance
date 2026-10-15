@@ -141,6 +141,34 @@ def history():
     conn.close()
 
     return render_template("history.html", records=records)
+    
+@app.route("/history-data")
+def history_data():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Please login first"}), 401
+
+    conn = sqlite3.connect("predictions.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT probability, date
+        FROM predictions
+        ORDER BY id ASC
+    """)
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    records = [
+        {
+            "probability": row[0],
+            "date": row[1]
+        }
+        for row in rows
+    ]
+
+    return jsonify(records)
+
 
 
 if __name__ == "__main__":
