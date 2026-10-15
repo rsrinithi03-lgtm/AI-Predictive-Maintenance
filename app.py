@@ -2,8 +2,11 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 import sqlite3
 from datetime import datetime
+import os
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "temporary-demo-key-change-this")
+
 
 def init_db():
     conn = sqlite3.connect("predictions.db")
@@ -29,16 +32,19 @@ def init_db():
 init_db()
 
 
-from flask import session, redirect, url_for
-import os
+@app.route("/")
+def home():
+    if not session.get("logged_in"):
+        return redirect(url_for("login_page"))
+    return render_template("index.html")
 
-app.secret_key = os.environ.get("SECRET_KEY", "temporary-demo-key-change-this")
 
 @app.route("/login-page")
 def login_page():
     if session.get("logged_in"):
         return redirect(url_for("home"))
     return render_template("login.html")
+
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -54,48 +60,27 @@ def login():
 
     return "Invalid username or password. Please go back and try again.", 401
 
+
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for("login_page"))
 
 
-@app.route("/")
-def home():
-    return render_template("index.html")
-    
 @app.route("/predict", methods=["POST"])
 def predict():
-    
-@app.route("/history")
-def history():
-    if not session.get("logged_in"):
-        return redirect(url_for("login_page"))
-
-    conn = sqlite3.connect("predictions.db")
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT temperature, vibration, pressure, rpm,
-               probability, status, date
-        FROM predictions
-        ORDER BY id DESC
-    """)
-
-    records = cursor.fetchall()
-    conn.close()
-
-    return render_template("history.html", records=records)
-
     if not session.get("logged_in"):
         return jsonify({"error": "Please login first"}), 401
 
-    data = request.get_json()
+    data = request.get_json() or {}
 
-    temperature = float(data.get("temperature", 72))
-    vibration = float(data.get("vibration", 4.2))
-    pressure = float(data.get("pressure", 70))
-    rpm = float(data.get("rpm", 1450))
+    try:
+        temperature = float(data.get("temperature", 72))
+        vibration = float(data.get("vibration", 4.2))
+        pressure = float(data.get("pressure", 70))
+        rpm = float(data.get("rpm", 1450))
+    except (TypeError, ValueError):
+        return jsonify({"error": "Invalid sensor values"}), 400
 
     risk = 0
 
@@ -136,31 +121,27 @@ def history():
         "status": status
     })
 
-    data = request.get_json()
 
-    temperature = float(data.get("temperature", 72))
-    vibration = float(data.get("vibration", 4.2))
-    pressure = float(data.get("pressure", 70))
-    rpm = float(data.get("rpm", 1450))
+@app.route("/history")
+def history():
+    if not session.get("logged_in"):
+        return redirect(url_for("login_page"))
 
-    risk = 0
+    conn = sqlite3.connect("predictions.db")
+    cursor = conn.cursor()
 
-    if temperature > 80:
-        risk += 30
-    if vibration > 5:
-        risk += 30
-    if pressure > 90 or pressure < 40:
-        risk += 20
-    if rpm > 1600 or rpm < 600:
-        risk += 20
+    cursor.execute("""
+        SELECT temperature, vibration, pressure, rpm,
+               probability, status, date
+        FROM predictions
+        ORDER BY id DESC
+    """)
 
-    risk = min(risk, 100)
-    status = "Warning" if risk >= 30 else "Normal"
+    records = cursor.fetchall()
+    conn.close()
 
-    return jsonify({
-        "failure_probability": risk,
-        "status": status
-    })
+    return render_template("history.html", records=records)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
