@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 import sqlite3
 from datetime import datetime
 
@@ -66,6 +66,27 @@ def home():
     
 @app.route("/predict", methods=["POST"])
 def predict():
+    
+@app.route("/history")
+def history():
+    if not session.get("logged_in"):
+        return redirect(url_for("login_page"))
+
+    conn = sqlite3.connect("predictions.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT temperature, vibration, pressure, rpm,
+               probability, status, date
+        FROM predictions
+        ORDER BY id DESC
+    """)
+
+    records = cursor.fetchall()
+    conn.close()
+
+    return render_template("history.html", records=records)
+
     if not session.get("logged_in"):
         return jsonify({"error": "Please login first"}), 401
 
