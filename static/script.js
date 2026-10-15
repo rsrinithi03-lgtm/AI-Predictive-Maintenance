@@ -34,3 +34,105 @@ async function runPrediction() {
     }
 }
 
+let sensorChartInstance = null;
+let historyChartInstance = null;
+
+function createMonitoringCharts() {
+    const sensorCanvas = document.getElementById("sensorChart");
+    const historyCanvas = document.getElementById("historyChart");
+
+    if (!sensorCanvas || !historyCanvas || typeof Chart === "undefined") {
+        return;
+    }
+
+    // Sensor chart
+    if (sensorChartInstance) {
+        sensorChartInstance.destroy();
+    }
+
+    sensorChartInstance = new Chart(sensorCanvas, {
+        type: "bar",
+        data: {
+            labels: ["Temperature (°C)", "Vibration (mm/s)", "Pressure (PSI)", "RPM"],
+            datasets: [{
+                label: "Current Sensor Values",
+                data: [
+                    Number(document.getElementById("temperature")?.value || 72),
+                    Number(document.getElementById("vibration")?.value || 4.2),
+                    Number(document.getElementById("pressure")?.value || 70),
+                    Number(document.getElementById("rpm")?.value || 1450)
+                ],
+                backgroundColor: [
+                    "#2563eb",
+                    "#16a34a",
+                    "#f59e0b",
+                    "#9333ea"
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Prediction history chart
+    fetch("/history-data")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("History data request failed");
+            }
+            return response.json();
+        })
+        .then(records => {
+            if (historyChartInstance) {
+                historyChartInstance.destroy();
+            }
+
+            historyChartInstance = new Chart(historyCanvas, {
+                type: "line",
+                data: {
+                    labels: records.map(record => record.date),
+                    datasets: [{
+                        label: "Failure Probability (%)",
+                        data: records.map(record => record.probability),
+                        borderColor: "#dc2626",
+                        backgroundColor: "rgba(220, 38, 38, 0.12)",
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error("Could not load prediction history chart:", error);
+        });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    createMonitoringCharts();
+
+    const inputIds = ["temperature", "vibration", "pressure", "rpm"];
+
+    inputIds.forEach(id => {
+        const input = document.getElementById(id);
+
+        if (input) {
+            input.addEventListener("input", function () {
+                createMonitoringCharts();
+            });
+        }
+    });
+});
+
