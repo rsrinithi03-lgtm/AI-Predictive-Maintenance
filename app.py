@@ -3,6 +3,37 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
+from flask import session, redirect, url_for
+import os
+
+app.secret_key = os.environ.get("SECRET_KEY", "temporary-demo-key-change-this")
+
+@app.route("/login-page")
+def login_page():
+    if session.get("logged_in"):
+        return redirect(url_for("home"))
+    return render_template("login.html")
+
+@app.route("/login", methods=["POST"])
+def login():
+    username = request.form.get("username", "")
+    password = request.form.get("password", "")
+
+    expected_username = os.environ.get("LOGIN_USERNAME", "admin")
+    expected_password = os.environ.get("LOGIN_PASSWORD", "ChangeMe123!")
+
+    if username == expected_username and password == expected_password:
+        session["logged_in"] = True
+        return redirect(url_for("home"))
+
+    return "Invalid username or password. Please go back and try again.", 401
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login_page"))
+
+
 @app.route("/")
 def home():
     return render_template("index.html")
