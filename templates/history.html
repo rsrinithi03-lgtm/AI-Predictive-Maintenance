@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction History</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 25px;
+            color: #0f172a;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            overflow-x: auto;
+        }
+
+        h1 {
+            color: #2563eb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #0f172a;
+            color: white;
+        }
+
+        a {
+            display: inline-block;
+            margin: 10px 10px 10px 0;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .empty {
+            padding: 20px;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Prediction History</h1>
+        <p>Previous machine prediction records</p>
+
+        <a href="/">← Back to Dashboard</a>
+        <a href="/logout">Logout</a>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Temperature (°C)</th>
+                    <th>Vibration (mm/s)</th>
+                    <th>Pressure (PSI)</th>
+                    <th>RPM</th>
+                    <th>Probability (%)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in records %}
+                <tr>
+                    <td>{{ item[6] }}</td>
+                    <td>{{ item[0] }}</td>
+                    <td>{{ item[1] }}</td>
+                    <td>{{ item[2] }}</td>
+                    <td>{{ item[3] }}</td>
+                    <td>{{ item[4] }}%</td>
+                    <td>{{ item[5] }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="empty">
+                        No prediction records yet. Run a prediction first.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
