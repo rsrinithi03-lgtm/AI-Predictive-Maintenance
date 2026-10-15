@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Predictive Maintenance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <nav>
+        <div class="logo">AI Predictive Maintenance</div>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#dashboard">Dashboard</a>
+            <a href="#about">About</a>
+        </div>
+    </nav>
+
+    <header id="home" class="hero">
+        <h1>Smart Machine Monitoring</h1>
+        <p>Predict machine failure before it happens using sensor readings.</p>
+        <a href="#dashboard" class="btn">Start Prediction</a>
+    </header>
+
+    <main>
+        <section id="dashboard" class="panel">
+            <h2>Machine Dashboard</h2>
+            <p>Enter your machine sensor values.</p>
+
+            <div class="inputs">
+                <label>Temperature (°C)
+                    <input id="temperature" type="number" value="72">
+                </label>
+                <label>Vibration (mm/s)
+                    <input id="vibration" type="number" step="0.1" value="4.2">
+                </label>
+                <label>Pressure (PSI)
+                    <input id="pressure" type="number" value="70">
+                </label>
+                <label>RPM
+                    <input id="rpm" type="number" value="1450">
+                </label>
+            </div>
+
+            <button class="btn" onclick="runPrediction()">Run Prediction</button>
+
+            <div class="result">
+                <h3>Failure Probability: <span id="probability">--</span>%</h3>
+                <p>Machine Status: <strong id="status">Waiting for prediction</strong></p>
+                <p id="message">Enter sensor values and run a prediction.</p>
+            </div>
+        </section>
+
+        <section id="about" class="panel about">
+            <h2>About This Project</h2>
+            <p>AI Predictive Maintenance monitors machine sensor values and estimates potential failure risk. This demo
+                uses simple rules to calculate risk; it is not a validated industrial AI model.</p>
+        </section>
+    </main>
+
+    <footer>AI Predictive Maintenance | 2026</footer>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
