@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | AI Predictive Maintenance</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #2563eb);
+            padding: 20px;
+        }
+
+        .login-box {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 { text-align: center; color: #0f172a; font-size: 25px; }
+        p { text-align: center; color: #64748b; }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            font-weight: bold;
+            color: #334155;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover { background: #1d4ed8; }
+        .error { color: #dc2626; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>Welcome Back!</h1>
+        <p>AI Predictive Maintenance</p>
+
+        <form action="/login" method="POST">
+            <label for="username">Username</label>
+            <input id="username" name="username"
+                   type="text" placeholder="Enter username" required>
+
+            <label for="password">Password</label>
+            <input id="password" name="password"
+                   type="password" placeholder="Enter password" required>
+
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+</html>
