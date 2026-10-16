@@ -144,6 +144,40 @@ def history():
     
 @app.route("/history-data")
 def history_data():
+    
+@app.route("/history-data")
+def history_data():
+    if not session.get("logged_in"):
+        return jsonify({"error": "Please login first"}), 401
+
+    conn = sqlite3.connect("predictions.db")
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT temperature, vibration, pressure, rpm,
+               probability, status, date
+        FROM predictions
+        ORDER BY id ASC
+    """)
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    records = [
+        {
+            "temperature": row[0],
+            "vibration": row[1],
+            "pressure": row[2],
+            "rpm": row[3],
+            "probability": row[4],
+            "status": row[5],
+            "date": row[6]
+        }
+        for row in rows
+    ]
+
+    return jsonify(records)
+
     if not session.get("logged_in"):
         return jsonify({"error": "Please login first"}), 401
 
